@@ -4,6 +4,16 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 const FullScreenMenu = ({ isOpen, onClose, menuItems, onItemClick }) => {
+  // Function to handle menu item clicks and close the menu.
+  const handleMenuItemClick = () => {
+    onClose(); // Close the menu when an item is clicked.
+
+    // Optional: Execute a callback when a menu item is clicked.
+    if (onItemClick) {
+      onItemClick();
+    }
+  };
+
   return (
     <div
       className={`fixed inset-0  ${
@@ -24,13 +34,15 @@ const FullScreenMenu = ({ isOpen, onClose, menuItems, onItemClick }) => {
               <Link
                 href="/"
                 className="hover:text-emerald-400 link link-underline cursor-pointer"
+                onClick={handleMenuItemClick}
               >
                 {item.toUpperCase()}
               </Link>
             ) : (
               <Link
                 href={`/${item.toLowerCase()}`}
-                className=" hover:text-emerald-400 link link-underline cursor-pointer"
+                className="hover:text-emerald-400 link link-underline cursor-pointer"
+                onClick={handleMenuItemClick}
               >
                 {item.toUpperCase()}
               </Link>
