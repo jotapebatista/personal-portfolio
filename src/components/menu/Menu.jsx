@@ -5,7 +5,7 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 const Menu = ({ onItemClick }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuItems = ["Home", "About", "Portfolio", "Contact"];
+  const menuItems = ["Home", "About", "Contact"];
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
