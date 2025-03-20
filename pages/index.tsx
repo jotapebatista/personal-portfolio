@@ -28,7 +28,7 @@ export default function Home() {
 				<meta property="og:site_name" content="João Batista" />
 				<meta property="og:description" content={meta.description} />
 				<meta property="og:title" content={meta.title} />
-				<meta property="og:image" content={meta.image} />
+
 			</Head>
 
 			<div className="relative min-h-screen bg-AAprimary w-full">
