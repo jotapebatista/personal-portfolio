@@ -174,7 +174,7 @@ export default function GetInTouch() {
 							<textarea
 								id="message"
 								name="message"
-								rows="5"
+								rows={5}
 								className="w-full p-3 rounded-lg bg-AAtertiary border border-gray-400 text-gray-400 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
 								placeholder="Your Message"
 								value={formData.message}
