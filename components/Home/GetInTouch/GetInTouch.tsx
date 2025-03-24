@@ -76,22 +76,33 @@ export default function GetInTouch() {
 				draggable
 				pauseOnFocusLoss
 			/>
-
 			{/* Title */}
-			<div className="flex flex-row items-center space-x-2">
-				<ArrowIcon className="h-6 w-6 text-AAsecondary" />
-				<span className="text-AAsecondary font-sans text-base sm:text-lg">
-					04.
-				</span>
-				<span className="text-AAsecondary font-sans text-lg sm:text-xl">
-					What&apos;s Next?
-				</span>
+			<div className="flex flex-col space-y-8 px-4 sm:px-0 w-full sm:w-[500px] md:w-[700px] lg:w-[900px]">
+				<section className="flex flex-row items-center">
+					<div className="flex flex-row items-center">
+						<ArrowIcon
+							className={
+								"flex-none h-4 md:h-6 w-4 md:w-5 text-AAsecondary"
+							}
+						/>
+						{/* <span className="text-AAsecondary font-sans text-sm  sm:text-xl">
+						{" "}
+						02.
+					</span> */}
+					</div>
+
+					<span className="text-gray-200 opacity-85 font-bold tracking-wider text-lg md:text-2xl px-3">
+						{/* Where I&apos;ve Worked */}
+						Get in Touch
+					</span>
+					<div className="bg-gray-400 h-[0.2px] w-28 sm:w-44 md:w-80"></div>
+				</section>
 			</div>
 
 			{/* Heading */}
-			<span className="text-gray-200 text-4xl sm:text-5xl font-bold tracking-wide opacity-85">
+			{/* <span className="text-gray-200 text-4xl sm:text-5xl font-bold tracking-wide opacity-85">
 				Get In Touch
-			</span>
+			</span> */}
 
 			{/* Description */}
 			<p className="text-gray-400 text-center px-6 sm:px-16 md:px-0 max-w-2xl text-lg leading-relaxed">
@@ -194,7 +205,7 @@ export default function GetInTouch() {
 			)}
 
 			{/* Contact Button */}
-			<div className="pt-6">
+			{/* <div className="pt-6">
 				{isAndroidWebView ? (
 					<button className="font-mono text-lg text-AAsecondary border-AAsecondary px-6 py-3 border-2 rounded-lg hover:bg-AAsecondary hover:text-AAprimary transition-all">
 						abdellatif@anaflous.com
@@ -210,7 +221,7 @@ export default function GetInTouch() {
 						</button>
 					</a>
 				)}
-			</div>
+			</div> */}
 		</div>
 	);
 }

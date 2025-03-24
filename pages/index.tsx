@@ -5,6 +5,7 @@ import AboutMe from "../components/Home/AboutMe/AboutMe";
 import WhereIHaveWorked from "../components/Home/WhereIHaveWorked/WhereIHaveWorked";
 import GetInTouch from "../components/Home/GetInTouch/GetInTouch";
 import Footer from "../components/Footer/Footer";
+import SomethingIveBuilt from "../components/Home/SomethingIveBuilt/SomethingIveBuilt";
 import Head from "next/head";
 import { useRef } from "react";
 
@@ -37,6 +38,7 @@ export default function Home() {
 				<SocialMediaArround finishedLoading={true} />
 				<AboutMe />
 				<WhereIHaveWorked />
+				<SomethingIveBuilt />
 				<GetInTouch />
 				{/* <Footer
 					githubUrl={"https://github.com/hktitof/my-website"}
