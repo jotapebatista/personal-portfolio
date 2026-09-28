@@ -56,7 +56,7 @@ const go = (href: string, e: Event) => {
 
 .nav__links {
   display: flex;
-  gap: clamp(0.85rem, 2vw, 1.6rem);
+  gap: clamp(0.65rem, 2vw, 1.6rem);
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text);
@@ -71,10 +71,10 @@ const go = (href: string, e: Event) => {
   opacity: 1;
 }
 
-@media (max-width: 640px) {
-  .nav__links a:nth-child(2),
-  .nav__links a:nth-child(3) {
-    display: none;
+@media (max-width: 520px) {
+  .nav__links {
+    gap: 0.7rem;
+    font-size: 0.78rem;
   }
 }
 </style>

@@ -94,5 +94,22 @@ useScrollReveal(root)
   line-height: 1.55;
   display: grid;
   gap: 0.35rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .exp__item {
+    padding: 1.35rem 0;
+  }
+
+  .exp__head {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .exp__points {
+    padding-left: 1rem;
+    font-size: 0.9rem;
+  }
 }
 </style>

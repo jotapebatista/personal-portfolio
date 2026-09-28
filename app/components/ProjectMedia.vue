@@ -905,4 +905,51 @@ const skeletonCaption = computed(() => {
     transition: none;
   }
 }
+
+@media (max-width: 899px) {
+  .phone-stage {
+    padding: 0.75rem 1.5rem 1rem;
+    perspective: none;
+  }
+
+  .phone,
+  .phone.is-tilted {
+    width: min(100%, 200px);
+    transform: none;
+    filter: drop-shadow(0 16px 24px color-mix(in srgb, #000 45%, transparent));
+  }
+
+  .laptop-stage {
+    padding: 0.5rem 0 1rem;
+    perspective: none;
+    overflow: hidden;
+  }
+
+  .laptop,
+  .laptop.is-tilted {
+    width: 100%;
+    max-width: 100%;
+    transform: none;
+    filter: drop-shadow(0 14px 22px color-mix(in srgb, #000 40%, transparent));
+  }
+
+  .laptop__chrome {
+    padding: 0.4rem;
+    border-radius: 0.65rem;
+  }
+
+  .media {
+    max-height: min(48vh, 360px);
+  }
+
+  .phone-stage .media__nav--prev,
+  .laptop-stage .media__nav--prev {
+    left: 0;
+  }
+
+  .phone-stage .media__nav--next,
+  .laptop-stage .media__nav--next {
+    right: 0;
+  }
+}
 </style>

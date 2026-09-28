@@ -200,6 +200,48 @@ onMounted(async () => {
   box-shadow: 0 -24px 48px color-mix(in srgb, var(--bg) 65%, transparent);
 }
 
+/* Sticky stack + tall media = clipped hell on phones */
+@media (max-width: 899px) {
+  .work__panel {
+    position: relative;
+    top: auto;
+    min-height: 0;
+    align-items: stretch;
+    box-shadow: none;
+  }
+
+  .work__panel-inner {
+    padding: 2.5rem 0;
+    gap: 1.25rem;
+  }
+
+  .work__ongoing {
+    padding: 2.5rem 0;
+  }
+
+  .work__title {
+    font-size: clamp(1.85rem, 9vw, 2.75rem);
+    line-height: 1.05;
+  }
+
+  .work__blurb {
+    font-size: 0.98rem;
+  }
+
+  .work__media {
+    max-width: 100%;
+    justify-self: stretch;
+  }
+
+  .work__panel {
+    overflow: hidden;
+  }
+
+  .work__wash {
+    display: none;
+  }
+}
+
 .work__panel--ongoing {
   border-top-style: dashed;
   border-top-color: color-mix(in srgb, var(--accent) 40%, var(--line));

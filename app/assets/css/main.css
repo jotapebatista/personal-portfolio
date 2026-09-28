@@ -24,6 +24,7 @@ html {
   color-scheme: dark;
   background: var(--bg);
   scroll-padding-top: calc(var(--nav-h) + 0.5rem);
+  overflow-x: clip;
 }
 
 html.lenis,
@@ -44,6 +45,7 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
 }
 
 body.has-custom-cursor,
@@ -76,8 +78,33 @@ img {
 }
 
 .container {
-  width: min(1120px, calc(100% - 2.5rem));
+  width: min(1120px, calc(100% - 2rem));
   margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .container {
+    width: min(1120px, calc(100% - 2.5rem));
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --nav-h: 3.75rem;
+  }
+
+  .section {
+    padding: clamp(3.5rem, 10vh, 6rem) 0;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 9vw, 3rem);
+    margin: 0.35rem 0 1.15rem;
+  }
+
+  .btn {
+    padding: 0.85rem 1.15rem;
+  }
 }
 
 .eyebrow {

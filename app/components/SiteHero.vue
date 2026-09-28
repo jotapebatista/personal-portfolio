@@ -46,16 +46,26 @@ watch(
   { immediate: true },
 )
 
-const nameChars = site.name.split('')
+const nameParts = site.name.split(' ')
 </script>
 
 <template>
   <section ref="root" class="hero section">
     <div class="container hero__grid">
       <p class="eyebrow" data-fade>2026</p>
-      <h1 class="hero__title display" aria-label="João Batista">
-        <span v-for="(ch, i) in nameChars" :key="i" class="hero__char-wrap">
-          <span data-char class="hero__char">{{ ch === ' ' ? '\u00A0' : ch }}</span>
+      <h1 class="hero__title display" :aria-label="site.name">
+        <span
+          v-for="(word, wi) in nameParts"
+          :key="wi"
+          class="hero__word"
+        >
+          <span
+            v-for="(ch, ci) in word.split('')"
+            :key="`${wi}-${ci}`"
+            class="hero__char-wrap"
+          >
+            <span data-char class="hero__char">{{ ch }}</span>
+          </span>
         </span>
       </h1>
       <p class="hero__role" data-fade>{{ site.role }}</p>
@@ -74,19 +84,29 @@ const nameChars = site.name.split('')
   min-height: 100svh;
   display: flex;
   align-items: flex-end;
-  padding-top: calc(var(--nav-h) + 2rem);
-  padding-bottom: 4rem;
+  padding-top: calc(var(--nav-h) + 1.5rem);
+  padding-bottom: 3.5rem;
 }
 
 .hero__grid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
   max-width: 920px;
+  width: 100%;
 }
 
 .hero__title {
-  font-size: clamp(3.4rem, 12vw, 8.5rem);
+  font-size: clamp(2.5rem, 11vw, 8.5rem);
   margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.08em 0.25em;
+  max-width: 100%;
+}
+
+.hero__word {
+  display: inline-flex;
+  white-space: nowrap;
 }
 
 .hero__char-wrap {
@@ -106,14 +126,14 @@ const nameChars = site.name.split('')
 }
 
 .hero__role {
-  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-size: clamp(1.05rem, 2.4vw, 1.45rem);
   font-weight: 500;
   margin: 0;
 }
 
 .hero__tag {
   max-width: 38rem;
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 2.8vw, 1.05rem);
   line-height: 1.55;
   margin: 0;
 }
@@ -122,16 +142,27 @@ const nameChars = site.name.split('')
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .hero__scroll {
   position: absolute;
-  right: clamp(1.25rem, 4vw, 3rem);
-  bottom: 2rem;
+  right: clamp(1rem, 4vw, 3rem);
+  bottom: 1.5rem;
   font-size: 0.7rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   writing-mode: vertical-rl;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    align-items: center;
+    padding-bottom: 5rem;
+  }
+
+  .hero__scroll {
+    display: none;
+  }
 }
 </style>
