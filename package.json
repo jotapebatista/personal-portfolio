@@ -2,6 +2,7 @@
   "name": "portfolio",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.26.0",
   "engines": {
     "node": "24.x"
   },
