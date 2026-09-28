@@ -23,12 +23,12 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="footer">
-    <div class="container footer__inner">
+  <footer class="border-t border-line py-6 pb-8">
+    <div class="container flex flex-wrap items-center justify-between gap-3 text-[0.85rem]">
       <button
         type="button"
-        class="footer__copy"
-        :class="{ 'is-holding': holding }"
+        class="select-none text-muted transition-colors duration-250 hover:text-accent"
+        :class="{ 'text-accent': holding }"
         aria-label="Copyright — hold for a surprise"
         @pointerdown="startHold"
         @pointerup="endHold"
@@ -37,38 +37,7 @@ const year = new Date().getFullYear()
       >
         © {{ year }} João Batista
       </button>
-      <span class="muted footer__hint">Nuxt + GSAP</span>
+      <span class="muted text-xs">Nuxt + GSAP</span>
     </div>
   </footer>
 </template>
-
-<style scoped>
-.footer {
-  border-top: 1px solid var(--line);
-  padding: 1.5rem 0 2rem;
-}
-
-.footer__inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: center;
-  font-size: 0.85rem;
-}
-
-.footer__copy {
-  color: var(--muted);
-  transition: color 0.25s ease;
-  user-select: none;
-}
-
-.footer__copy:hover,
-.footer__copy.is-holding {
-  color: var(--accent);
-}
-
-.footer__hint {
-  font-size: 0.75rem;
-}
-</style>

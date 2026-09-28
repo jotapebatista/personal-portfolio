@@ -16,65 +16,30 @@ const go = (href: string, e: Event) => {
 </script>
 
 <template>
-  <header class="nav">
-    <div class="nav__inner container">
-      <button class="nav__logo display" type="button" aria-label="Home / easter egg" @click="onLogoClick">
+  <header class="fixed inset-x-0 top-0 z-40 h-nav border-b border-line bg-bg">
+    <div class="container flex h-full items-center justify-between">
+      <button
+        class="display text-[1.15rem] tracking-[-0.04em] text-text"
+        type="button"
+        aria-label="Home / easter egg"
+        @click="onLogoClick"
+      >
         JB
       </button>
-      <nav class="nav__links" aria-label="Primary">
-        <a v-for="link in links" :key="link.href" :href="link.href" @click="go(link.href, $event)">
+      <nav
+        class="flex gap-[clamp(0.65rem,2vw,1.6rem)] text-[0.85rem] font-medium text-text max-[520px]:gap-[0.7rem] max-[520px]:text-[0.78rem]"
+        aria-label="Primary"
+      >
+        <a
+          v-for="link in links"
+          :key="link.href"
+          class="opacity-70 transition-opacity duration-250 hover:opacity-100"
+          :href="link.href"
+          @click="go(link.href, $event)"
+        >
           {{ link.label }}
         </a>
       </nav>
     </div>
   </header>
 </template>
-
-<style scoped>
-.nav {
-  position: fixed;
-  top: 0;
-  inset-inline: 0;
-  z-index: 40;
-  height: var(--nav-h);
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-}
-
-.nav__inner {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.nav__logo {
-  font-size: 1.15rem;
-  letter-spacing: -0.04em;
-  color: var(--text);
-}
-
-.nav__links {
-  display: flex;
-  gap: clamp(0.65rem, 2vw, 1.6rem);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.nav__links a {
-  opacity: 0.72;
-  transition: opacity 0.25s ease;
-}
-
-.nav__links a:hover {
-  opacity: 1;
-}
-
-@media (max-width: 520px) {
-  .nav__links {
-    gap: 0.7rem;
-    font-size: 0.78rem;
-  }
-}
-</style>

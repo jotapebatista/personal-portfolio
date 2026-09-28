@@ -5,36 +5,13 @@ const { toast } = useEggs()
 <template>
   <Teleport to="body">
     <Transition name="toast">
-      <div v-if="toast" class="toast" role="status">{{ toast }}</div>
+      <div
+        v-if="toast"
+        class="fixed bottom-6 left-1/2 z-[120] -translate-x-1/2 rounded-full bg-accent px-[1.1rem] py-3 text-[0.9rem] font-semibold text-bg shadow-[0_12px_40px_color-mix(in_srgb,var(--bg)_55%,transparent)]"
+        role="status"
+      >
+        {{ toast }}
+      </div>
     </Transition>
   </Teleport>
 </template>
-
-<style scoped>
-.toast {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  translate: -50% 0;
-  z-index: 120;
-  padding: 0.75rem 1.1rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 12px 40px color-mix(in srgb, var(--bg) 55%, transparent);
-}
-
-.toast-enter-active,
-.toast-leave-active {
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-}
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-</style>

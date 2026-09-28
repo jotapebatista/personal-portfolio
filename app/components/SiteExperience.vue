@@ -10,23 +10,36 @@ useScrollReveal(root)
     <div class="container">
       <p class="eyebrow" data-reveal>Experience</p>
       <h2 class="section-title" data-reveal>Jobs</h2>
-      <ul class="exp">
-        <li v-for="job in experience" :key="job.company" class="exp__item" data-reveal>
-          <div class="exp__head">
-            <h3 class="exp__company display">{{ job.company }}</h3>
-            <span class="muted exp__period">{{ job.period }}</span>
+      <ul class="m-0 grid list-none gap-0 p-0">
+        <li
+          v-for="job in experience"
+          :key="job.company"
+          class="border-t border-line py-7 last:border-b max-sm:py-[1.35rem]"
+          data-reveal
+        >
+          <div
+            class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 max-sm:flex-col max-sm:gap-1"
+          >
+            <h3 class="display m-0 text-[clamp(1.5rem,3vw,2rem)]">
+              {{ job.company }}
+            </h3>
+            <span class="muted text-[0.9rem]">{{ job.period }}</span>
           </div>
-          <p class="exp__role">{{ job.role }}</p>
+          <p class="mt-[0.35rem] mb-[0.35rem] font-medium text-accent">
+            {{ job.role }}
+          </p>
           <a
             v-if="job.url"
-            class="exp__url muted"
+            class="muted mb-[0.85rem] inline-block text-[0.9rem] transition-colors duration-200 hover:text-accent"
             :href="job.url"
             target="_blank"
             rel="noreferrer"
           >
             {{ job.urlLabel || job.url }}
           </a>
-          <ul class="exp__points">
+          <ul
+            class="m-0 grid list-disc gap-[0.35rem] pl-[1.1rem] text-[0.95rem] leading-relaxed text-muted max-sm:pl-4 max-sm:text-[0.9rem]"
+          >
             <li v-for="(point, i) in job.points" :key="i">{{ point }}</li>
           </ul>
         </li>
@@ -34,82 +47,3 @@ useScrollReveal(root)
     </div>
   </section>
 </template>
-
-<style scoped>
-.exp {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0;
-}
-
-.exp__item {
-  padding: 1.75rem 0;
-  border-top: 1px solid var(--line);
-}
-
-.exp__item:last-child {
-  border-bottom: 1px solid var(--line);
-}
-
-.exp__head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  align-items: baseline;
-}
-
-.exp__company {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  margin: 0;
-}
-
-.exp__period {
-  font-size: 0.9rem;
-}
-
-.exp__role {
-  margin: 0.35rem 0 0.35rem;
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.exp__url {
-  display: inline-block;
-  font-size: 0.9rem;
-  margin-bottom: 0.85rem;
-  transition: color 0.2s ease;
-}
-
-.exp__url:hover {
-  color: var(--accent);
-}
-
-.exp__points {
-  margin: 0;
-  padding-left: 1.1rem;
-  color: var(--muted);
-  line-height: 1.55;
-  display: grid;
-  gap: 0.35rem;
-  font-size: 0.95rem;
-}
-
-@media (max-width: 640px) {
-  .exp__item {
-    padding: 1.35rem 0;
-  }
-
-  .exp__head {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .exp__points {
-    padding-left: 1rem;
-    font-size: 0.9rem;
-  }
-}
-</style>

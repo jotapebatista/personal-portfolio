@@ -10,9 +10,7 @@ export type MediaSlide =
 
 const props = defineProps<{
   title: string
-  /** each entry: path string, null skeleton, or { src, label, href } */
   sources: MediaSlide[]
-  /** Force shell. auto = phone if portrait, laptop if landscape */
   device?: 'auto' | 'phone' | 'laptop'
 }>()
 
@@ -21,12 +19,40 @@ const reduced = useReducedMotion()
 const index = ref(0)
 const stageRef = ref<HTMLElement | null>(null)
 const tilted = ref(false)
+const narrow = ref(false)
 
-/** What's painted — stays until the next slide is ready */
+const deviceTransform = (phone: boolean) => {
+  if (reduced.value || narrow.value) return { transform: 'none' }
+  if (phone) {
+    return tilted.value
+      ? { transform: 'rotateY(-14deg) rotateX(5deg) rotateZ(0.5deg)' }
+      : { transform: 'rotateY(-24deg) rotateX(9deg) rotateZ(1.5deg)' }
+  }
+  return tilted.value
+    ? { transform: 'rotateY(-8deg) rotateX(4deg)' }
+    : { transform: 'rotateY(-18deg) rotateX(8deg)' }
+}
+
+let mqNarrow: MediaQueryList | null = null
+const syncNarrow = () => {
+  if (!mqNarrow) return
+  narrow.value = mqNarrow.matches
+  if (narrow.value) tilted.value = false
+}
+
+onMounted(() => {
+  mqNarrow = window.matchMedia('(max-width: 899px)')
+  syncNarrow()
+  mqNarrow.addEventListener('change', syncNarrow)
+})
+
+onUnmounted(() => {
+  mqNarrow?.removeEventListener('change', syncNarrow)
+})
+
 const shown = ref<string | null>(null)
 const ratio = ref<number | null>(null)
 const errored = ref(false)
-/** First paint / null slide only — never flash this between real images */
 const cold = ref(true)
 
 const ratioCache = new Map<string, number>()
@@ -63,7 +89,6 @@ const showPhone = computed(() => {
 const showLaptop = computed(() => {
   if (mode.value === 'phone') return false
   if (mode.value === 'laptop') return true
-  // auto: laptop once we know it's landscape
   return isLandscapeRatio.value && !!shown.value && !errored.value
 })
 
@@ -75,7 +100,6 @@ const showSkeleton = computed(
 
 const aspectStyle = computed(() => {
   if (showLaptop.value) {
-    // Match screenshot ratio (Full HD = 16/9). Don't force 16/10 — that crops.
     if (ratio.value && ratio.value > 0) return { aspectRatio: `${ratio.value}` }
     return { aspectRatio: '16 / 9' }
   }
@@ -175,7 +199,7 @@ const go = (i: number) => {
 }
 
 const onEnter = () => {
-  if (!reduced.value) tilted.value = true
+  if (!reduced.value && !narrow.value) tilted.value = true
 }
 
 const onLeave = () => {
@@ -193,171 +217,219 @@ const skeletonCaption = computed(() => {
   if (multi.value) return `${props.title} · ${index.value + 1}/${slides.value.length}`
   return `${props.title} · no image`
 })
+
+const navBtn =
+  'absolute top-1/2 z-[4] grid size-8 -translate-y-1/2 place-items-center rounded-full border border-line bg-[color-mix(in_srgb,var(--bg)_75%,transparent)] text-[1.25rem] leading-none text-text backdrop-blur-md transition-colors hover:border-accent/50 hover:text-accent'
 </script>
 
 <template>
   <div
-    class="gallery"
-    :class="{
-      'is-phone': showPhone,
-      'is-laptop': showLaptop,
-      'is-flat': reduced,
-    }"
+    class="grid w-full gap-[0.65rem]"
+    :class="showPhone || showLaptop ? 'justify-items-center' : 'justify-items-stretch'"
   >
-    <!-- CSS 3D phone -->
+    <!-- Phone -->
     <div
       v-if="showPhone"
       ref="stageRef"
-      class="phone-stage"
+      class="relative grid w-full place-items-center px-10 py-5 pb-7 [perspective:1100px] [perspective-origin:50%_40%] max-[899px]:px-6 max-[899px]:py-3 max-[899px]:pb-4 max-[899px]:[perspective:none]"
       @pointerenter="onEnter"
       @pointerleave="onLeave"
     >
-      <div class="phone" :class="{ 'is-tilted': tilted }">
-        <div class="phone__bezel">
-          <div class="phone__island" aria-hidden="true" />
-          <div class="phone__screen" :style="aspectStyle">
+      <div
+        class="relative w-[min(100%,220px)] max-h-[min(58vh,480px)] [transform-style:preserve-3d] transition-transform duration-[550ms] drop-shadow-[18px_32px_36px_color-mix(in_srgb,#000_55%,transparent)] max-[899px]:w-[min(100%,200px)] max-[899px]:drop-shadow-[0_16px_24px_color-mix(in_srgb,#000_45%,transparent)]"
+        :class="reduced || narrow ? 'drop-shadow-[0_18px_28px_color-mix(in_srgb,#000_40%,transparent)]' : ''"
+        :style="deviceTransform(true)"
+      >
+        <div
+          class="relative rounded-[2.35rem] bg-[linear-gradient(145deg,#4a4744_0%,#1e1d1b_22%,#2c2a28_52%,#0e0d0c_100%)] p-[0.58rem] shadow-[inset_0_1px_0_color-mix(in_srgb,#fff_22%,transparent),inset_0_-1px_0_color-mix(in_srgb,#000_60%,transparent),inset_1px_0_0_color-mix(in_srgb,#fff_8%,transparent),0_0_0_1.5px_#050505,0_0_0_2.5px_#2a2826] [transform:translateZ(12px)]"
+        >
+          <span
+            class="absolute top-[18%] -left-[3px] h-[9%] w-[3px] rounded-sm bg-[linear-gradient(180deg,#3a3835,#161514)] shadow-[inset_0_1px_0_color-mix(in_srgb,#fff_10%,transparent),0_14px_0_0_#1a1917,0_32px_0_0_#1a1917]"
+            aria-hidden="true"
+          />
+          <span
+            class="absolute top-[24%] -right-[3px] h-[11%] w-[3px] rounded-sm bg-[linear-gradient(180deg,#3a3835,#161514)] shadow-[inset_0_1px_0_color-mix(in_srgb,#fff_12%,transparent)]"
+            aria-hidden="true"
+          />
+          <div
+            class="absolute top-[0.95rem] left-1/2 z-[3] h-[1.1rem] w-[30%] -translate-x-1/2 rounded-full bg-[#050504] shadow-[inset_0_0_0_1px_color-mix(in_srgb,#fff_7%,transparent),0_0_0_1px_color-mix(in_srgb,#000_80%,transparent)]"
+            aria-hidden="true"
+          />
+          <div
+            class="relative w-full isolate overflow-hidden rounded-[1.7rem] bg-[#050504]"
+            :style="aspectStyle"
+          >
             <Transition name="cross">
               <img
                 :key="shown!"
-                class="phone__img"
+                class="block h-auto w-full"
                 :src="shown!"
                 :alt="`${current.label || title} screenshot ${index + 1}`"
                 draggable="false"
               >
             </Transition>
+            <div
+              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_14%,transparent)_0%,transparent_38%,transparent_62%,color-mix(in_srgb,#000_18%,transparent)_100%)] opacity-85 mix-blend-soft-light"
+              aria-hidden="true"
+            />
           </div>
-          <div class="phone__home" aria-hidden="true" />
+          <div
+            class="absolute bottom-[0.7rem] left-1/2 z-[3] h-[0.2rem] w-[30%] -translate-x-1/2 rounded-full bg-[color-mix(in_srgb,var(--text)_32%,transparent)]"
+            aria-hidden="true"
+          />
         </div>
       </div>
 
       <template v-if="multi">
-        <button type="button" class="media__nav media__nav--prev" aria-label="Previous image" @click="prev">
+        <button type="button" :class="[navBtn, 'left-0.5 max-[899px]:left-0']" aria-label="Previous image" @click="prev">
           ‹
         </button>
-        <button type="button" class="media__nav media__nav--next" aria-label="Next image" @click="next">
+        <button type="button" :class="[navBtn, 'right-0.5 max-[899px]:right-0']" aria-label="Next image" @click="next">
           ›
         </button>
       </template>
     </div>
 
-    <!-- CSS 3D MacBook -->
+    <!-- Laptop / display -->
     <div
       v-else-if="showLaptop"
       ref="stageRef"
-      class="laptop-stage"
+      class="relative grid w-full place-items-center overflow-hidden px-2 py-3 pb-5 [perspective:1400px] [perspective-origin:50%_40%] max-[899px]:px-0 max-[899px]:py-2 max-[899px]:pb-4 max-[899px]:[perspective:none]"
       @pointerenter="onEnter"
       @pointerleave="onLeave"
     >
-      <div class="laptop" :class="{ 'is-tilted': tilted }">
-        <div class="laptop__chrome">
-          <div class="laptop__screen" :style="aspectStyle">
+      <div
+        class="relative w-[min(100%,440px)] [transform-style:preserve-3d] transition-transform duration-[550ms] drop-shadow-[16px_28px_32px_color-mix(in_srgb,#000_50%,transparent)] max-[899px]:w-full max-[899px]:max-w-full max-[899px]:drop-shadow-[0_14px_22px_color-mix(in_srgb,#000_40%,transparent)]"
+        :style="deviceTransform(false)"
+      >
+        <div
+          class="relative rounded-[0.85rem] bg-[linear-gradient(145deg,#3d3c3a_0%,#1a1918_35%,#2a2927_65%,#121110_100%)] p-[0.55rem] shadow-[inset_0_1px_0_color-mix(in_srgb,#fff_18%,transparent),inset_0_-1px_0_color-mix(in_srgb,#000_50%,transparent),inset_1px_0_0_color-mix(in_srgb,#fff_8%,transparent),0_0_0_1px_#0a0a09] [transform:translateZ(8px)] max-[899px]:rounded-[0.65rem] max-[899px]:p-[0.4rem]"
+        >
+          <span
+            class="absolute top-[0.2rem] left-1/2 z-[3] size-[0.32rem] -translate-x-1/2 rounded-full bg-[#1a1a1a] shadow-[inset_0_0_0_1px_color-mix(in_srgb,#fff_10%,transparent),0_0_0_2px_#0a0a0a]"
+            aria-hidden="true"
+          />
+          <div
+            class="relative w-full isolate overflow-hidden rounded-[0.28rem] bg-[#0a0908]"
+            :style="aspectStyle"
+          >
             <Transition name="cross">
               <img
                 v-if="shown"
                 :key="shown"
-                class="laptop__img"
+                class="block h-auto w-full"
                 :src="shown"
                 :alt="`${current.label || title} screenshot ${index + 1}`"
                 draggable="false"
               >
             </Transition>
-            <div v-if="showSkeleton" class="skeleton skeleton--laptop" aria-hidden="true">
-              <div class="skeleton__chrome">
-                <span class="skeleton__dot" />
-                <span class="skeleton__dot" />
-                <span class="skeleton__dot" />
-                <span class="skeleton__url" />
+            <div
+              v-if="showSkeleton"
+              class="absolute inset-0 flex flex-col gap-3 bg-[#0c0c0b] p-[0.85rem]"
+              aria-hidden="true"
+            >
+              <div class="flex h-[1.1rem] items-center gap-[0.35rem]">
+                <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+                <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+                <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+                <span class="animate-shimmer ml-[0.4rem] h-[0.55rem] flex-1 rounded-full bg-muted/20" />
               </div>
-              <div class="skeleton__body">
-                <div class="skeleton__hero" />
-                <div class="skeleton__rows">
-                  <span class="skeleton__line skeleton__line--lg" />
-                  <span class="skeleton__line" />
-                  <span class="skeleton__line skeleton__line--sm" />
+              <div class="grid min-h-0 flex-1 grid-rows-[1.1fr_auto_auto] gap-[0.65rem]">
+                <div class="animate-shimmer min-h-0 rounded-[0.55rem] bg-muted/15" />
+                <div class="grid gap-[0.4rem]">
+                  <span class="animate-shimmer block h-[0.7rem] w-[72%] rounded-full bg-muted/15" />
+                  <span class="animate-shimmer block h-[0.55rem] w-full rounded-full bg-muted/15" />
+                  <span class="animate-shimmer block h-[0.55rem] w-[48%] rounded-full bg-muted/15" />
                 </div>
-                <div class="skeleton__cards">
-                  <span />
-                  <span />
-                  <span />
+                <div class="grid grid-cols-3 gap-2">
+                  <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
+                  <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
+                  <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
                 </div>
               </div>
-              <p class="skeleton__caption muted">
+              <p class="muted m-0 text-center text-[0.7rem] tracking-wide">
                 {{ skeletonCaption }}
               </p>
             </div>
+            <div
+              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_10%,transparent)_0%,transparent_42%,transparent_68%,color-mix(in_srgb,#000_22%,transparent)_100%)] opacity-75 mix-blend-soft-light"
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>
 
       <template v-if="multi">
-        <button type="button" class="media__nav media__nav--prev" aria-label="Previous image" @click="prev">
+        <button type="button" :class="[navBtn, 'left-0.5 max-[899px]:left-0']" aria-label="Previous image" @click="prev">
           ‹
         </button>
-        <button type="button" class="media__nav media__nav--next" aria-label="Next image" @click="next">
+        <button type="button" :class="[navBtn, 'right-0.5 max-[899px]:right-0']" aria-label="Next image" @click="next">
           ›
         </button>
       </template>
     </div>
 
-    <!-- Flat / loading (auto mid-ratio or cold without forced laptop) -->
+    <!-- Flat media -->
     <div
       v-else
-      class="media"
-      :class="{
-        'is-ready': shown && !errored,
-        'is-landscape': isLandscapeRatio,
-      }"
+      class="relative w-full max-w-full max-h-[min(62vh,520px)] overflow-hidden rounded-2xl border border-line bg-surface max-[899px]:max-h-[min(48vh,360px)]"
+      :class="isLandscapeRatio ? 'max-h-[min(52vh,420px)]' : ''"
       :style="aspectStyle"
     >
       <Transition name="cross">
         <img
           v-if="shown"
           :key="shown"
-          class="media__img"
+          class="absolute inset-0 h-full w-full object-cover"
           :src="shown"
           :alt="`${current.label || title} screenshot ${index + 1}`"
           draggable="false"
         >
       </Transition>
 
-      <div v-if="showSkeleton" class="skeleton" aria-hidden="true">
-        <div class="skeleton__chrome">
-          <span class="skeleton__dot" />
-          <span class="skeleton__dot" />
-          <span class="skeleton__dot" />
-          <span class="skeleton__url" />
+      <div
+        v-if="showSkeleton"
+        class="absolute inset-0 flex flex-col gap-3 bg-surface p-[0.85rem]"
+        aria-hidden="true"
+      >
+        <div class="flex h-[1.1rem] items-center gap-[0.35rem]">
+          <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+          <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+          <span class="animate-shimmer size-[0.45rem] rounded-full bg-muted/35" />
+          <span class="animate-shimmer ml-[0.4rem] h-[0.55rem] flex-1 rounded-full bg-muted/20" />
         </div>
-        <div class="skeleton__body">
-          <div class="skeleton__hero" />
-          <div class="skeleton__rows">
-            <span class="skeleton__line skeleton__line--lg" />
-            <span class="skeleton__line" />
-            <span class="skeleton__line skeleton__line--sm" />
+        <div class="grid min-h-0 flex-1 grid-rows-[1.1fr_auto_auto] gap-[0.65rem]">
+          <div class="animate-shimmer min-h-0 rounded-[0.55rem] bg-muted/15" />
+          <div class="grid gap-[0.4rem]">
+            <span class="animate-shimmer block h-[0.7rem] w-[72%] rounded-full bg-muted/15" />
+            <span class="animate-shimmer block h-[0.55rem] w-full rounded-full bg-muted/15" />
+            <span class="animate-shimmer block h-[0.55rem] w-[48%] rounded-full bg-muted/15" />
           </div>
-          <div class="skeleton__cards">
-            <span />
-            <span />
-            <span />
+          <div class="grid grid-cols-3 gap-2">
+            <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
+            <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
+            <span class="animate-shimmer block aspect-[4/3] rounded-[0.4rem] bg-muted/15" />
           </div>
         </div>
-        <p class="skeleton__caption muted">
+        <p class="muted m-0 text-center text-[0.7rem] tracking-wide">
           {{ skeletonCaption }}
         </p>
       </div>
 
       <template v-if="multi">
-        <button type="button" class="media__nav media__nav--prev" aria-label="Previous image" @click="prev">
+        <button type="button" :class="[navBtn, 'left-[0.55rem]']" aria-label="Previous image" @click="prev">
           ‹
         </button>
-        <button type="button" class="media__nav media__nav--next" aria-label="Next image" @click="next">
+        <button type="button" :class="[navBtn, 'right-[0.55rem]']" aria-label="Next image" @click="next">
           ›
         </button>
       </template>
     </div>
 
-    <p v-if="current.label" class="gallery__label muted">
+    <p v-if="current.label" class="m-0 text-center text-[0.8rem] tracking-wide text-muted">
       <a
         v-if="current.href"
+        class="border-b border-accent/45 text-inherit no-underline transition-colors hover:border-accent hover:text-accent"
         :href="current.href"
         target="_blank"
         rel="noreferrer"
@@ -365,13 +437,18 @@ const skeletonCaption = computed(() => {
       <template v-else>{{ current.label }}</template>
     </p>
 
-    <div v-if="multi" class="gallery__dots" role="tablist" :aria-label="`${title} images`">
+    <div
+      v-if="multi"
+      class="flex justify-center gap-[0.4rem]"
+      role="tablist"
+      :aria-label="`${title} images`"
+    >
       <button
         v-for="(slide, i) in slides"
         :key="i"
         type="button"
-        class="gallery__dot"
-        :class="{ 'is-active': i === index }"
+        class="h-[0.45rem] rounded-full transition-[background,width] duration-200"
+        :class="i === index ? 'w-[1.1rem] bg-accent' : 'w-[0.45rem] bg-muted/45'"
         :aria-label="slide.label || `Image ${i + 1}`"
         :aria-selected="i === index"
         @click="go(i)"
@@ -379,577 +456,3 @@ const skeletonCaption = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.gallery {
-  display: grid;
-  gap: 0.65rem;
-  width: 100%;
-  justify-items: stretch;
-}
-
-.gallery.is-phone,
-.gallery.is-laptop {
-  justify-items: center;
-}
-
-.gallery__label {
-  margin: 0;
-  font-size: 0.8rem;
-  letter-spacing: 0.02em;
-  text-align: center;
-}
-
-.gallery__label a {
-  color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.gallery__label a:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-/* —— CSS 3D phone —— */
-.phone-stage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  perspective: 1100px;
-  perspective-origin: 50% 40%;
-  padding: 1.25rem 2.5rem 1.75rem;
-}
-
-.phone {
-  position: relative;
-  width: min(100%, 220px);
-  max-height: min(58vh, 480px);
-  transform-style: preserve-3d;
-  transform: rotateY(-24deg) rotateX(9deg) rotateZ(1.5deg);
-  transition: transform 0.55s var(--ease-out);
-  filter: drop-shadow(18px 32px 36px color-mix(in srgb, #000 55%, transparent));
-}
-
-.phone.is-tilted {
-  transform: rotateY(-14deg) rotateX(5deg) rotateZ(0.5deg);
-}
-
-.gallery.is-flat .phone,
-.gallery.is-flat .phone.is-tilted {
-  transform: none;
-  filter: drop-shadow(0 18px 28px color-mix(in srgb, #000 40%, transparent));
-}
-
-.phone__bezel {
-  position: relative;
-  border-radius: 2.35rem;
-  padding: 0.58rem;
-  background:
-    linear-gradient(
-      145deg,
-      #4a4744 0%,
-      #1e1d1b 22%,
-      #2c2a28 52%,
-      #0e0d0c 100%
-    );
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, #000 60%, transparent),
-    inset 1px 0 0 color-mix(in srgb, #fff 8%, transparent),
-    0 0 0 1.5px #050505,
-    0 0 0 2.5px #2a2826;
-  transform: translateZ(12px);
-}
-
-.phone__bezel::before,
-.phone__bezel::after {
-  content: '';
-  position: absolute;
-  background: linear-gradient(180deg, #3a3835, #161514);
-  border-radius: 2px;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-}
-
-.phone__bezel::before {
-  left: -3px;
-  top: 18%;
-  width: 3px;
-  height: 9%;
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent),
-    0 14px 0 0 #1a1917,
-    0 32px 0 0 #1a1917;
-}
-
-.phone__bezel::after {
-  right: -3px;
-  top: 24%;
-  width: 3px;
-  height: 11%;
-}
-
-.phone__island {
-  position: absolute;
-  top: 0.95rem;
-  left: 50%;
-  z-index: 3;
-  width: 30%;
-  height: 1.1rem;
-  translate: -50% 0;
-  border-radius: 999px;
-  background: #050504;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff 7%, transparent),
-    0 0 0 1px color-mix(in srgb, #000 80%, transparent);
-}
-
-.phone__screen {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 1.7rem;
-  background: #050504;
-  isolation: isolate;
-}
-
-.phone__screen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      125deg,
-      color-mix(in srgb, #fff 14%, transparent) 0%,
-      transparent 38%,
-      transparent 62%,
-      color-mix(in srgb, #000 18%, transparent) 100%
-    );
-  mix-blend-mode: soft-light;
-  opacity: 0.85;
-}
-
-.phone__img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.phone__home {
-  position: absolute;
-  bottom: 0.7rem;
-  left: 50%;
-  z-index: 3;
-  width: 30%;
-  height: 0.2rem;
-  translate: -50% 0;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--text) 32%, transparent);
-}
-
-/* —— CSS 3D display (clean screen, no laptop chin) —— */
-.laptop-stage {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  perspective: 1400px;
-  perspective-origin: 50% 40%;
-  padding: 0.75rem 0.5rem 1.25rem;
-}
-
-.laptop {
-  position: relative;
-  width: min(100%, 440px);
-  transform-style: preserve-3d;
-  transform: rotateY(-18deg) rotateX(8deg);
-  transition: transform 0.55s var(--ease-out);
-  filter: drop-shadow(16px 28px 32px color-mix(in srgb, #000 50%, transparent));
-}
-
-.laptop.is-tilted {
-  transform: rotateY(-8deg) rotateX(4deg);
-}
-
-.gallery.is-flat .laptop,
-.gallery.is-flat .laptop.is-tilted {
-  transform: none;
-  filter: drop-shadow(0 16px 24px color-mix(in srgb, #000 35%, transparent));
-}
-
-.laptop__chrome {
-  position: relative;
-  border-radius: 0.85rem;
-  padding: 0.55rem;
-  background:
-    linear-gradient(
-      145deg,
-      #3d3c3a 0%,
-      #1a1918 35%,
-      #2a2927 65%,
-      #121110 100%
-    );
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, #000 50%, transparent),
-    inset 1px 0 0 color-mix(in srgb, #fff 8%, transparent),
-    0 0 0 1px #0a0a09;
-  transform: translateZ(8px);
-}
-
-.laptop__camera {
-  position: absolute;
-  top: 0.2rem;
-  left: 50%;
-  z-index: 3;
-  width: 0.32rem;
-  height: 0.32rem;
-  translate: -50% 0;
-  border-radius: 50%;
-  background: #1a1a1a;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff 10%, transparent),
-    0 0 0 2px #0a0a0a;
-}
-
-.laptop__screen {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 0.28rem;
-  background: #0a0908;
-  isolation: isolate;
-}
-
-.laptop__screen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      125deg,
-      color-mix(in srgb, #fff 10%, transparent) 0%,
-      transparent 42%,
-      transparent 68%,
-      color-mix(in srgb, #000 22%, transparent) 100%
-    );
-  mix-blend-mode: soft-light;
-  opacity: 0.75;
-}
-
-.laptop__img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* crossfade */
-.cross-enter-active,
-.cross-leave-active {
-  transition: opacity 0.32s var(--ease-out);
-}
-
-.cross-leave-active {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.cross-enter-from,
-.cross-leave-to {
-  opacity: 0;
-}
-
-/* —— Flat media —— */
-.media {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  max-height: min(62vh, 520px);
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--surface);
-}
-
-.media.is-landscape {
-  width: 100%;
-  max-height: min(52vh, 420px);
-}
-
-.media__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.media.is-ready .media__img {
-  opacity: 1;
-}
-
-.media__nav {
-  position: absolute;
-  top: 50%;
-  translate: 0 -50%;
-  z-index: 4;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  color: var(--text);
-  font-size: 1.25rem;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  backdrop-filter: blur(8px);
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.media__nav:hover {
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-  color: var(--accent);
-}
-
-.media__nav--prev {
-  left: 0.55rem;
-}
-
-.media__nav--next {
-  right: 0.55rem;
-}
-
-.phone-stage .media__nav--prev,
-.laptop-stage .media__nav--prev {
-  left: 0.15rem;
-}
-
-.phone-stage .media__nav--next,
-.laptop-stage .media__nav--next {
-  right: 0.15rem;
-}
-
-.gallery__dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-.gallery__dot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--muted) 45%, transparent);
-  transition:
-    background 0.2s ease,
-    width 0.2s ease;
-}
-
-.gallery__dot.is-active {
-  width: 1.1rem;
-  background: var(--accent);
-}
-
-.skeleton {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 0.85rem;
-  gap: 0.75rem;
-  background: var(--surface);
-}
-
-.skeleton--laptop {
-  background: #0c0c0b;
-}
-
-.skeleton__chrome {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  height: 1.1rem;
-}
-
-.skeleton__dot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--muted) 35%, transparent);
-}
-
-.skeleton__url {
-  flex: 1;
-  height: 0.55rem;
-  margin-left: 0.4rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--muted) 18%, transparent);
-}
-
-.skeleton__body {
-  flex: 1;
-  display: grid;
-  grid-template-rows: 1.1fr auto auto;
-  gap: 0.65rem;
-  min-height: 0;
-}
-
-.skeleton__hero,
-.skeleton__line,
-.skeleton__cards span,
-.skeleton__url {
-  position: relative;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--muted) 14%, transparent);
-}
-
-.skeleton__hero,
-.skeleton__line,
-.skeleton__cards span,
-.skeleton__url,
-.skeleton__dot {
-  background-image: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--accent) 16%, transparent),
-    transparent
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-
-.skeleton__hero {
-  border-radius: 0.55rem;
-  min-height: 0;
-}
-
-.skeleton__rows {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.skeleton__line {
-  display: block;
-  height: 0.55rem;
-  border-radius: 999px;
-  width: 100%;
-}
-
-.skeleton__line--lg {
-  width: 72%;
-  height: 0.7rem;
-}
-
-.skeleton__line--sm {
-  width: 48%;
-}
-
-.skeleton__cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-
-.skeleton__cards span {
-  display: block;
-  aspect-ratio: 4 / 3;
-  border-radius: 0.4rem;
-}
-
-.skeleton__caption {
-  margin: 0;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  text-align: center;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton__hero,
-  .skeleton__line,
-  .skeleton__cards span,
-  .skeleton__url,
-  .skeleton__dot {
-    animation: none;
-  }
-
-  .media,
-  .phone,
-  .laptop,
-  .phone__img,
-  .laptop__img,
-  .media__img,
-  .cross-enter-active,
-  .cross-leave-active {
-    transition: none;
-  }
-}
-
-@media (max-width: 899px) {
-  .phone-stage {
-    padding: 0.75rem 1.5rem 1rem;
-    perspective: none;
-  }
-
-  .phone,
-  .phone.is-tilted {
-    width: min(100%, 200px);
-    transform: none;
-    filter: drop-shadow(0 16px 24px color-mix(in srgb, #000 45%, transparent));
-  }
-
-  .laptop-stage {
-    padding: 0.5rem 0 1rem;
-    perspective: none;
-    overflow: hidden;
-  }
-
-  .laptop,
-  .laptop.is-tilted {
-    width: 100%;
-    max-width: 100%;
-    transform: none;
-    filter: drop-shadow(0 14px 22px color-mix(in srgb, #000 40%, transparent));
-  }
-
-  .laptop__chrome {
-    padding: 0.4rem;
-    border-radius: 0.65rem;
-  }
-
-  .media {
-    max-height: min(48vh, 360px);
-  }
-
-  .phone-stage .media__nav--prev,
-  .laptop-stage .media__nav--prev {
-    left: 0;
-  }
-
-  .phone-stage .media__nav--next,
-  .laptop-stage .media__nav--next {
-    right: 0;
-  }
-}
-</style>

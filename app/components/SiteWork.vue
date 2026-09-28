@@ -44,7 +44,7 @@ onMounted(async () => {
   })
 
   gsap.fromTo(
-    root.value.querySelectorAll('.work__intro [data-reveal]'),
+    root.value.querySelectorAll('[data-work-intro] [data-reveal]'),
     { y: 28, opacity: 0 },
     {
       y: 0,
@@ -53,7 +53,7 @@ onMounted(async () => {
       stagger: 0.06,
       ease: 'power2.out',
       scrollTrigger: {
-        trigger: root.value.querySelector('.work__intro'),
+        trigger: root.value.querySelector('[data-work-intro]'),
         start: 'top 80%',
         once: true,
       },
@@ -64,48 +64,72 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section id="work" ref="root" class="work section">
-    <div class="container work__intro">
+  <section id="work" ref="root" class="section pb-0">
+    <div class="container mb-8" data-work-intro>
       <p class="eyebrow" data-reveal>Work</p>
       <h2 class="section-title" data-reveal>Projects</h2>
     </div>
 
-    <div class="work__stack-wrap">
+    <div class="relative">
       <article
         v-for="(project, i) in projects"
         :key="project.id"
-        class="work__panel"
+        class="sticky top-nav flex min-h-[calc(100svh-var(--nav-h))] items-center overflow-hidden border-t border-line bg-bg shadow-[0_-24px_48px_color-mix(in_srgb,var(--bg)_65%,transparent)] max-[899px]:relative max-[899px]:top-auto max-[899px]:shadow-none"
         data-panel
         :style="{ zIndex: i + 1 }"
       >
         <div
-          class="container work__panel-inner"
-          :class="{ 'has-media': hasImageSlot(project) }"
+          class="container relative grid w-full gap-6 py-14 max-[899px]:gap-5 max-[899px]:py-10"
+          :class="
+            hasImageSlot(project)
+              ? 'items-center min-[900px]:max-w-[1000px] min-[900px]:grid-cols-[minmax(0,1fr)_minmax(300px,480px)] min-[900px]:gap-9'
+              : ''
+          "
         >
-          <div class="work__copy">
-            <div class="work__meta" data-reveal>
+          <div class="grid max-w-xl gap-[0.85rem]">
+            <div class="flex items-baseline gap-4" data-reveal>
               <span class="eyebrow">{{ String(i + 1).padStart(2, '0') }}</span>
               <span class="muted">{{ project.year }}</span>
               <template v-if="project.credit">
                 <span class="muted" aria-hidden="true">·</span>
                 <a
                   v-if="project.creditUrl"
-                  class="work__credit"
+                  class="text-[0.85rem] text-muted no-underline transition-colors duration-200 hover:text-accent hover:border-b hover:border-accent/50"
                   :href="project.creditUrl"
                   target="_blank"
                   rel="noreferrer"
                 >{{ project.credit }}</a>
-                <span v-else class="work__credit">{{ project.credit }}</span>
+                <span v-else class="text-[0.85rem] text-muted">{{ project.credit }}</span>
               </template>
             </div>
-            <h3 class="work__title display" data-reveal>{{ project.title }}</h3>
-            <p class="work__blurb" data-reveal>{{ project.blurb }}</p>
-            <ul v-if="project.stack.length" class="work__stack" data-reveal>
-              <li v-for="tech in project.stack" :key="tech">{{ tech }}</li>
+            <h3
+              class="display m-0 text-[clamp(2.35rem,5.8vw,4.1rem)] max-[899px]:text-[clamp(1.85rem,9vw,2.75rem)] max-[899px]:leading-[1.05]"
+              data-reveal
+            >
+              {{ project.title }}
+            </h3>
+            <p
+              class="m-0 max-w-lg text-[1.05rem] leading-relaxed text-muted max-[899px]:text-[0.98rem]"
+              data-reveal
+            >
+              {{ project.blurb }}
+            </p>
+            <ul
+              v-if="project.stack.length"
+              class="mt-[0.35rem] mb-0 flex list-none flex-wrap gap-2 p-0"
+              data-reveal
+            >
+              <li
+                v-for="tech in project.stack"
+                :key="tech"
+                class="rounded-full border border-line px-[0.7rem] py-[0.35rem] text-[0.8rem] text-muted"
+              >
+                {{ tech }}
+              </li>
             </ul>
             <div
               v-if="project.liveUrl || project.repoUrl || siteLinks(project).length"
-              class="work__links"
+              class="mt-[0.35rem] flex flex-wrap gap-[0.65rem]"
               data-reveal
             >
               <MagneticButton
@@ -138,34 +162,48 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div v-if="hasImageSlot(project)" class="work__media" data-reveal>
+          <div
+            v-if="hasImageSlot(project)"
+            class="relative w-full max-w-[480px] justify-self-start min-[900px]:justify-self-end max-[899px]:max-w-full max-[899px]:justify-self-stretch"
+            data-reveal
+          >
             <ProjectMedia
               :title="project.title"
               :sources="project.images!"
               :device="project.device"
             />
           </div>
-
-          <div class="work__wash" aria-hidden="true" />
         </div>
       </article>
 
-      <!-- Not a project — signal the catalog isn’t closed -->
       <article
-        class="work__panel work__panel--ongoing"
+        class="sticky top-nav flex min-h-[calc(100svh-var(--nav-h))] items-center overflow-hidden border-t border-dashed border-[color-mix(in_srgb,var(--accent)_40%,var(--line))] bg-bg shadow-[0_-24px_48px_color-mix(in_srgb,var(--bg)_65%,transparent)] max-[899px]:relative max-[899px]:top-auto max-[899px]:shadow-none"
         data-panel
         :style="{ zIndex: projects.length + 1 }"
       >
-        <div class="container work__ongoing">
-          <div class="work__meta" data-reveal>
-            <span class="work__live">
-              <span class="work__live-dot" aria-hidden="true" />
+        <div class="container relative grid max-w-2xl gap-[0.85rem] py-14 max-[899px]:py-10">
+          <div class="flex items-baseline gap-4" data-reveal>
+            <span class="inline-flex items-center gap-[0.55rem] text-xs tracking-[0.14em] text-accent uppercase">
+              <span
+                class="animate-live-pulse size-[0.45rem] rounded-full bg-accent"
+                aria-hidden="true"
+              />
               {{ workOngoing.eyebrow }}
             </span>
           </div>
-          <h3 class="work__title display" data-reveal>{{ workOngoing.title }}</h3>
-          <p class="work__blurb" data-reveal>{{ workOngoing.blurb }}</p>
-<div class="work__links" data-reveal>
+          <h3
+            class="display m-0 text-[clamp(2.35rem,5.8vw,4.1rem)] max-[899px]:text-[clamp(1.85rem,9vw,2.75rem)] max-[899px]:leading-[1.05]"
+            data-reveal
+          >
+            {{ workOngoing.title }}
+          </h3>
+          <p
+            class="m-0 max-w-lg text-[1.05rem] leading-relaxed text-muted max-[899px]:text-[0.98rem]"
+            data-reveal
+          >
+            {{ workOngoing.blurb }}
+          </p>
+          <div class="mt-[0.35rem] flex flex-wrap gap-[0.65rem]" data-reveal>
             <MagneticButton :href="`mailto:${site.email}`" primary>
               Email
             </MagneticButton>
@@ -175,229 +213,3 @@ onMounted(async () => {
     </div>
   </section>
 </template>
-
-<style scoped>
-.work {
-  padding-bottom: 0;
-}
-
-.work__intro {
-  margin-bottom: 2rem;
-}
-
-.work__stack-wrap {
-  position: relative;
-}
-
-.work__panel {
-  position: sticky;
-  top: var(--nav-h);
-  min-height: calc(100svh - var(--nav-h));
-  display: flex;
-  align-items: center;
-  background: var(--bg);
-  border-top: 1px solid var(--line);
-  box-shadow: 0 -24px 48px color-mix(in srgb, var(--bg) 65%, transparent);
-}
-
-/* Sticky stack + tall media = clipped hell on phones */
-@media (max-width: 899px) {
-  .work__panel {
-    position: relative;
-    top: auto;
-    min-height: 0;
-    align-items: stretch;
-    box-shadow: none;
-  }
-
-  .work__panel-inner {
-    padding: 2.5rem 0;
-    gap: 1.25rem;
-  }
-
-  .work__ongoing {
-    padding: 2.5rem 0;
-  }
-
-  .work__title {
-    font-size: clamp(1.85rem, 9vw, 2.75rem);
-    line-height: 1.05;
-  }
-
-  .work__blurb {
-    font-size: 0.98rem;
-  }
-
-  .work__media {
-    max-width: 100%;
-    justify-self: stretch;
-  }
-
-  .work__panel {
-    overflow: hidden;
-  }
-
-  .work__wash {
-    display: none;
-  }
-}
-
-.work__panel--ongoing {
-  border-top-style: dashed;
-  border-top-color: color-mix(in srgb, var(--accent) 40%, var(--line));
-}
-
-.work__panel-inner {
-  position: relative;
-  padding: 3.5rem 0;
-  display: grid;
-  gap: 1.5rem;
-  width: 100%;
-}
-
-.work__panel-inner.has-media {
-  align-items: center;
-}
-
-@media (min-width: 900px) {
-  .work__panel-inner.has-media {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 480px);
-    gap: 2.25rem;
-    max-width: 1000px;
-  }
-}
-
-.work__ongoing {
-  position: relative;
-  padding: 3.5rem 0;
-  display: grid;
-  gap: 0.85rem;
-  max-width: 40rem;
-}
-
-.work__copy {
-  display: grid;
-  gap: 0.85rem;
-  max-width: 36rem;
-}
-
-.work__meta {
-  display: flex;
-  gap: 1rem;
-  align-items: baseline;
-}
-
-.work__live {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.work__live-dot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
-  animation: live-pulse 1.8s ease-out infinite;
-}
-
-.work__credit {
-  font-size: 0.85rem;
-  color: var(--muted);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease;
-}
-
-a.work__credit:hover {
-  color: var(--accent);
-  border-bottom-color: color-mix(in srgb, var(--accent) 50%, transparent);
-}
-
-.work__title {
-  font-size: clamp(2.35rem, 5.8vw, 4.1rem);
-  margin: 0;
-}
-
-.work__blurb {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--muted);
-  margin: 0;
-  max-width: 32rem;
-}
-
-.work__stack {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0;
-  margin: 0.35rem 0 0;
-}
-
-.work__stack li {
-  font-size: 0.8rem;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-}
-
-.work__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: 0.35rem;
-}
-
-.work__media {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  justify-self: start;
-}
-
-@media (min-width: 900px) {
-  .work__media {
-    justify-self: end;
-  }
-}
-
-.work__wash {
-  position: absolute;
-  inset: auto -10% -30% auto;
-  width: min(42vw, 420px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
-  pointer-events: none;
-  filter: blur(8px);
-  z-index: -1;
-}
-
-@keyframes live-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
-  }
-  70% {
-    box-shadow: 0 0 0 0.55rem transparent;
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .work__live-dot {
-    animation: none;
-  }
-}
-</style>

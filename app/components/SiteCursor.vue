@@ -30,36 +30,13 @@ onMounted(() => {
 <template>
   <div
     v-if="enabled"
-    class="cursor"
-    :class="{ 'is-hover': hovering }"
+    class="pointer-events-none fixed top-0 left-0 z-[200] rounded-full bg-accent mix-blend-difference will-change-transform transition-[width,height,margin] duration-250"
+    :class="
+      hovering
+        ? 'h-7 w-7 -mt-3.5 -ml-3.5'
+        : 'h-[var(--cursor-size)] w-[var(--cursor-size)] -mt-[calc(var(--cursor-size)/2)] -ml-[calc(var(--cursor-size)/2)]'
+    "
     :style="{ transform: `translate3d(${x}px, ${y}px, 0)` }"
     aria-hidden="true"
   />
 </template>
-
-<style scoped>
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 200;
-  width: var(--cursor-size);
-  height: var(--cursor-size);
-  margin: calc(var(--cursor-size) / -2) 0 0 calc(var(--cursor-size) / -2);
-  border-radius: 50%;
-  background: var(--accent);
-  pointer-events: none;
-  mix-blend-mode: difference;
-  transition:
-    width 0.25s var(--ease-out),
-    height 0.25s var(--ease-out),
-    margin 0.25s var(--ease-out);
-  will-change: transform;
-}
-
-.cursor.is-hover {
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-}
-</style>
