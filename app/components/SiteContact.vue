@@ -6,7 +6,11 @@ useScrollReveal(root)
 </script>
 
 <template>
-  <section id="contact" ref="root" class="section pb-24">
+  <section
+    id="contact"
+    ref="root"
+    class="section flex min-h-[calc(100svh-var(--nav-h))] items-center pb-24"
+  >
     <div class="container">
       <p class="eyebrow" data-reveal>Contact</p>
       <h2 class="section-title" data-reveal>Email me</h2>

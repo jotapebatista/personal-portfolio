@@ -22,25 +22,15 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'João Batista — Full Stack',
+      title: 'João Batista — Full Stack Developer',
+      titleTemplate: '%s',
       htmlAttrs: { lang: 'en' },
       meta: [
-        {
-          name: 'description',
-          content:
-            'Full-stack in Portugal. Nuxt, Vue, .NET, SQL. EV chargers, PWAs, client sites.',
-        },
         { name: 'theme-color', content: '#0c0b0a' },
-        { property: 'og:title', content: 'João Batista — Full Stack' },
-        {
-          property: 'og:description',
-          content:
-            'Full-stack in Portugal. Nuxt, Vue, .NET, SQL. EV chargers, PWAs, client sites.',
-        },
-        { property: 'og:type', content: 'website' },
-        { property: 'og:url', content: 'https://jotapebatista.pt' },
+        { name: 'color-scheme', content: 'dark' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
-      link: [{ rel: 'canonical', href: 'https://jotapebatista.pt' }],
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     },
   },
 })

@@ -10,7 +10,7 @@ useScrollReveal(root)
     <div class="container grid gap-10 min-[900px]:grid-cols-[1.3fr_0.7fr] min-[900px]:items-end">
       <div>
         <p class="eyebrow" data-reveal>About</p>
-        <h2 class="section-title" data-reveal>About</h2>
+        <h2 class="section-title" data-reveal>Who I am</h2>
         <p
           class="mb-4 max-w-xl text-[clamp(1.2rem,2.4vw,1.55rem)] leading-snug"
           data-reveal

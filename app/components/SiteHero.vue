@@ -52,7 +52,7 @@ const nameParts = site.name.split(' ')
 <template>
   <section
     ref="root"
-    class="section relative flex min-h-svh items-end pt-[calc(var(--nav-h)+1.5rem)] pb-14 max-sm:items-center max-sm:pb-20"
+    class="section relative flex min-h-svh items-end pt-[calc(var(--nav-h)+1.5rem)] pb-14 max-sm:pb-20"
   >
     <div class="container grid w-full max-w-[920px] gap-4">
       <p class="eyebrow opacity-0" data-fade>2026</p>
@@ -84,8 +84,7 @@ const nameParts = site.name.split(' ')
         {{ site.tagline }}
       </p>
       <div class="mt-2 flex flex-wrap gap-3 opacity-0" data-fade>
-        <MagneticButton href="#work" primary>Work</MagneticButton>
-        <MagneticButton href="#contact">Email</MagneticButton>
+        <MagneticButton href="#work" primary>See the work</MagneticButton>
       </div>
     </div>
     <div

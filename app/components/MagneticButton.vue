@@ -27,16 +27,26 @@ const onLeave = () => {
 
 const onClick = (e: MouseEvent) => {
   emit('click', e)
-  if (props.href?.startsWith('#')) {
+  if (e.defaultPrevented || !props.href) return
+
+  // In-page anchors → Lenis
+  if (props.href.startsWith('#')) {
     e.preventDefault()
     scrollTo(props.href)
+    return
+  }
+
+  // mailto is often swallowed by smooth-scroll / custom handlers — force it
+  if (props.href.startsWith('mailto:')) {
+    e.preventDefault()
+    window.location.assign(props.href)
   }
 }
 </script>
 
 <template>
-  <component
-    :is="href ? 'a' : 'button'"
+  <a
+    v-if="href"
     ref="el"
     :href="href"
     :target="target"
@@ -48,5 +58,17 @@ const onClick = (e: MouseEvent) => {
     @click="onClick"
   >
     <slot />
-  </component>
+  </a>
+  <button
+    v-else
+    ref="el"
+    type="button"
+    class="btn"
+    :class="{ 'btn-primary': primary }"
+    @mousemove="onMove"
+    @mouseleave="onLeave"
+    @click="onClick"
+  >
+    <slot />
+  </button>
 </template>

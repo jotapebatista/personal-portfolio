@@ -269,7 +269,7 @@ const navBtn =
               >
             </Transition>
             <div
-              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_14%,transparent)_0%,transparent_38%,transparent_62%,color-mix(in_srgb,#000_18%,transparent)_100%)] opacity-85 mix-blend-soft-light"
+              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_8%,transparent)_0%,transparent_42%,transparent_68%,color-mix(in_srgb,#000_12%,transparent)_100%)] opacity-50 mix-blend-soft-light"
               aria-hidden="true"
             />
           </div>
@@ -352,7 +352,7 @@ const navBtn =
               </p>
             </div>
             <div
-              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_10%,transparent)_0%,transparent_42%,transparent_68%,color-mix(in_srgb,#000_22%,transparent)_100%)] opacity-75 mix-blend-soft-light"
+              class="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(125deg,color-mix(in_srgb,#fff_6%,transparent)_0%,transparent_45%,transparent_70%,color-mix(in_srgb,#000_14%,transparent)_100%)] opacity-45 mix-blend-soft-light"
               aria-hidden="true"
             />
           </div>

@@ -50,8 +50,12 @@ export function useSmoothScroll() {
   })
 
   const scrollTo = (target: string | HTMLElement, options?: { offset?: number }) => {
+    // Lenis ignores CSS scroll-padding — offset handles the fixed nav
+    const navH = document.querySelector('header')?.getBoundingClientRect().height ?? 72
+    const navOffset = options?.offset ?? -(navH + 12)
+
     if (lenis.value) {
-      lenis.value.scrollTo(target, { offset: options?.offset ?? -80 })
+      lenis.value.scrollTo(target, { offset: navOffset })
       return
     }
     if (typeof target === 'string') {

@@ -2,7 +2,9 @@ export const site = {
   name: 'João Batista',
   role: 'Full Stack Developer',
   email: 'joao-oliveirabatista@hotmail.com',
-  tagline: 'Nuxt, .NET, and whatever sits between the browser and the DB. Portugal.',
+  tagline: 'I build the whole product — and get it live.',
+  url: 'https://jotapebatista.pt',
+  locale: 'en_PT',
   links: {
     github: 'https://github.com/jotapebatista',
     linkedin: 'https://www.linkedin.com/in/jotapebatista',
@@ -24,17 +26,11 @@ export type Project = {
   year: string
   blurb: string
   stack: string[]
-  /** Company credit when the work isn’t yours alone / personal */
   credit?: string
   creditUrl?: string
   liveUrl?: string
   repoUrl?: string
-  /** Force device chrome. auto = phone if portrait, laptop if landscape. */
   device?: 'auto' | 'phone' | 'laptop'
-  /**
-   * Media slides. Omit = no media column.
-   * `null` / `{ src: null }` = skeleton; string = `/public/...` path.
-   */
   images?: ProjectImage[]
 }
 
